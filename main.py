@@ -1,34 +1,26 @@
 import asyncio
-
 import aiohttp
+import requests
+
 from bs4 import BeautifulSoup as bs
 
 
 def parse_page(page):
-    soup = bs(page, 'html.parser')
+    soup = bs(page, 'lxml')
 
     pg = soup.find_all('li', 'catalog-grid__cell')
     # print(pg)
 
     for i in pg:
         print(i.a.img['title'])
-        print(i.a.img['src'])
-        print(i.img('ng-star-inserted'))
-        # print(i.p['goods-tile__description'])
-        print(i.find('span', 'goods-tile__price-value'))
-        print(i.find('p', 'goods-tile__description goods-tile__description_type_text ng-star-inserted'))
+        print(i.find('span', 'goods-tile__price-value').string)
+        print(i.find('p', 'goods-tile__description goods-tile__description_type_text ng-star-inserted').string)
         print('\n')
-
-    # print(soup.find('ul', 'catalog-grid ng-star-inserted'))
-    # for i in soup.find('ul', 'catalog-grid ng-star-inserted'):
-    #     print(i.a)
-
 
 
 async def fetch_connect(session):
-        async with session.get('https://rozetka.com.ua/mobile-phones/c80003/') as response:
-
-            html = await response.text()
+        async with session.get('https://rozetka.com.ua/mobile-phones/c80003/', allow_redirects=True) as response:
+            html = await response.read()
             parse_page(html)
 
 
