@@ -18,8 +18,10 @@ def parse_page(page):
         print('\n')
 
 
-async def fetch_connect(session):
-        async with session.get('https://rozetka.com.ua/mobile-phones/c80003/', allow_redirects=True) as response:
+async def fetch_connect(session, page):
+        async with session.get(
+                f'https://rozetka.com.ua/mobile-phones/c80003//page={page}',
+                allow_redirects=True) as response:
             html = await response.read()
             parse_page(html)
 
@@ -27,8 +29,9 @@ async def fetch_connect(session):
 async def main():
     tasks = []
     async with aiohttp.ClientSession() as session:
-        task = asyncio.create_task(fetch_connect(session))
-        tasks.append(task)
+        for page in range(1, 67):
+            task = asyncio.create_task(fetch_connect(session, page))
+            tasks.append(task)
         await asyncio.gather(*tasks, return_exceptions=True)
 
 
